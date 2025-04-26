@@ -5,11 +5,10 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract QuestCertificateNFT is ERC721, ERC721URIStorage, ERC721Enumerable, Ownable {
-    using Counters for Counters.Counter;
-    Counters.Counter private _tokenIds;
+    // Counter for token IDs
+    uint256 private _tokenIdCounter;
 
     // Quest completion data structure
     struct QuestCompletion {
@@ -57,8 +56,8 @@ contract QuestCertificateNFT is ERC721, ERC721URIStorage, ERC721Enumerable, Owna
     ) external onlyOwner returns (uint256) {
         require(!playerQuestCompletions[player][questId], "Quest already completed by player");
 
-        _tokenIds.increment();
-        uint256 newTokenId = _tokenIds.current();
+        _tokenIdCounter++;
+        uint256 newTokenId = _tokenIdCounter;
 
         _safeMint(player, newTokenId);
         _setTokenURI(newTokenId, metadataURI);
@@ -118,6 +117,13 @@ contract QuestCertificateNFT is ERC721, ERC721URIStorage, ERC721Enumerable, Owna
      */
     function hasCompletedQuest(address player, string memory questId) external view returns (bool) {
         return playerQuestCompletions[player][questId];
+    }
+
+    /**
+     * @dev Returns the current token ID counter
+     */
+    function getCurrentTokenId() external view returns (uint256) {
+        return _tokenIdCounter;
     }
 
     // Override required functions
